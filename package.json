@@ -1,0 +1,22 @@
+{
+  "name": "elasticsearch-reindex-in-place",
+  "version": "0.0.0",
+  "description": "Node.js scripts to manually reindex old indices with the reindex API",
+  "main": "reindex.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/weijunyu/elasticsearch-reindex-in-place.git"
+  },
+  "author": "Wei Junyu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/weijunyu/elasticsearch-reindex-in-place/issues"
+  },
+  "homepage": "https://github.com/weijunyu/elasticsearch-reindex-in-place#readme",
+  "dependencies": {
+    "superagent": "^3.8.3"
+  }
+}
