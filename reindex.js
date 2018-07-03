@@ -9,6 +9,7 @@ let ca = fs.readFileSync(path.resolve(__dirname, config.ca));
 let indices = config.indices; // List or object holding names of indices to refresh
 let settings = config.settings;
 let mappings = config.mappings;
+let suffix = config.suffix; // Suffix for new indices, eg v2
 
 let indexNames;
 if (Array.isArray(indices)) {
@@ -24,7 +25,7 @@ if (Array.isArray(indices)) {
 function createNewIndices() {
     let promises = [];
     for (indexName of indexNames) {
-        let endpoint = `https://${config.elasticsearch.host}/${indexName}-v2`;
+        let endpoint = `https://${config.elasticsearch.host}/${indexName}${suffix}`;
         let requestPromise = request.put(endpoint)
             .ca(ca)
             .send({
@@ -36,7 +37,7 @@ function createNewIndices() {
                 mappings: mappings.mappings
             })
             .then(function (response) {
-                console.log(`Index created: ${indexName}.`);
+                console.log(`Index created: ${indexName}${suffix}.`);
                 return response.body
             })
 
@@ -67,20 +68,20 @@ function reindexDocuments() {
                     index: indexName
                 },
                 dest: {
-                    index: indexName + '-v2'
+                    index: indexName + suffix
                 }
             })
             .then(function (response) {
-                console.log(`Reindexed from ${indexName} to ${indexName}-v2.`);
+                console.log(`Reindexed from ${indexName} to ${indexName}${suffix}.`);
                 reindexResults[indexName] = {
-                    to: indexName + '-v2',
+                    to: indexName + suffix,
                     success: true
                 }
             })
             .catch(function (error) {
-                console.log(`Error reindexing from ${indexName} to ${indexName}-v2.`);
+                console.log(`Error reindexing from ${indexName} to ${indexName}${suffix}.`);
                 reindexResults[indexName] = {
-                    to: indexName + '-v2',
+                    to: indexName + suffix,
                     success: false
                 }
             })
@@ -102,21 +103,21 @@ function resetOldIndicesSettings() {
     let promises = [];
     let resetResults = {};
     for (let indexName of indexNames) {
-        let endpoint = `https://${config.elasticsearch.host}/${indexName}-v2/_settings`;
+        let endpoint = `https://${config.elasticsearch.host}/${indexName}${suffix}/_settings`;
         let requestPromise = request.put(endpoint)
             .ca(ca)
             .send({
                 index: settings.settings.index
             })
             .then(function (response) {
-                console.log(`Reset settings for ${indexName}-v2 success.`);
-                resetResults[indexName + '-v2'] = {
+                console.log(`Reset settings for ${indexName}${suffix} success.`);
+                resetResults[indexName + suffix] = {
                     success: true
                 }
             })
             .catch(function (error) {
-                console.log(`Reset settings for ${indexName}-v2 failed.`);
-                resetResults[indexName + '-v2'] = {
+                console.log(`Reset settings for ${indexName}${suffix} failed.`);
+                resetResults[indexName + suffix] = {
                     success: false,
                     error: error
                 }
@@ -151,7 +152,7 @@ function updateAliases() {
                 actions: [
                     {
                         add: {
-                            index: indexName + '-v2',
+                            index: indexName + suffix,
                             alias: indexName
                         }
                     },
@@ -163,14 +164,14 @@ function updateAliases() {
                 ]
             })
             .then(function(response) {
-                console.log(`Update alias for ${indexName}-v2 success.`);
-                updateResults[indexName + '-v2'] = {
+                console.log(`Update alias for ${indexName}${suffix} success.`);
+                updateResults[indexName + suffix] = {
                     success: true
                 }
             })
             .catch(function(error) {
-                console.log(`Update alias for ${indexName}-v2 failed.`);
-                updateResults[indexName + '-v2'] = {
+                console.log(`Update alias for ${indexName}${suffix} failed.`);
+                updateResults[indexName + suffix] = {
                     success: false,
                     error: error
                 }

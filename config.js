@@ -10,5 +10,5 @@ module.exports = {
     elasticsearch: {
         host: ''
     },
-    suffix: 'v2'
+    suffix: '-v2'
 }
